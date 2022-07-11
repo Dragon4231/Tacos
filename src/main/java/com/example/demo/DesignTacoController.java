@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.example.demo.Ingridient.Type;
+
+import javax.validation.Valid;
 
 @Slf4j
 @Controller
@@ -60,5 +63,17 @@ public class DesignTacoController {
                 .stream()
                 .filter(x -> x.getType().equals(type))
                 .collect(Collectors.toList());
+    }
+
+    @PostMapping
+    public String processTaco(@Valid Taco taco,
+                              Errors errors,
+                              @ModelAttribute TacoOrder tacoOrder) {
+        if(errors.hasErrors()){
+            return "design";
+        }
+        tacoOrder.addTaco(taco);
+        log.info("Processing taco: {}", taco);
+        return "redirect:/orders/current";
     }
 }
